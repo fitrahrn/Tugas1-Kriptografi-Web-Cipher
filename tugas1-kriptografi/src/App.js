@@ -73,7 +73,7 @@ function App() {
       }
       else {
         let newPos1 =[pos1[0],pos2[1]];
-        let newPos2 = [pos1[1],pos2[0]];
+        let newPos2 = [pos2[0],pos1[1]];
         pos1 = newPos1;
         pos2 = newPos2;
       }
