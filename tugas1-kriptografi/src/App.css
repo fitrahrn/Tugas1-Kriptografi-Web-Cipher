@@ -48,6 +48,14 @@ input[type="radio"]{
   position: relative;
   top: 2px;
 }
+input[type="number"]{
+  display: inline-block;
+  width: 100px;
+  margin:10px 10px 10px 10px;
+  position: relative;
+  top: 2px;
+}
+
 .pill{
   display: inline-block;
   margin: 20px 10px 0 0;

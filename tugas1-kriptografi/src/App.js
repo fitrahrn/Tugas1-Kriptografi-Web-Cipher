@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import {encryptPlayfair,decryptPlayfair} from './cipher/playfairCipher';
 import './App.css';
 
 function App() {
@@ -8,125 +9,81 @@ function App() {
   const [cypherType,setCypher] = useState(""); //set cypher type
   const [charType,setChar] = useState("")// plaintext or hex
   const [cypherKey,setKey] = useState(""); // cipher key
+  const [affineKey,setAffineKey] = useState([0,0]);
+  const [hillKey,setHillKey] = useState([])
   const [resultText,setResult] = useState(""); //text after encrypted decrypt
+  const [encryptTrue,setEncrypt] = useState(true);
 
-  const encrypt = async (event)=>{
-    event.preventDefault();
-    let text=inputText;
-    const key = playfairKey(cypherKey);
-    let encrypted='';
-    text = text.replace(/\s/gi,'');
-    text = text.replace(/j/gi,'i');
-    for (let i =0;i<text.length;i++){
-      let char = cypherKey.charAt(i);
-      if(char.charCodeAt(0) >64  && char.charCodeAt(0) <123  ){
-        if(char.charCodeAt(0)>64 && char.charCodeAt(0)<91){
-          char = String.fromCharCode(char.charCodeAt(0) +32);
-        }
-      }
-      if(i+1<text.length && text.charAt(i) === text.charAt(i+1) && i%2===0){
-        console.log("true");
-        text = text.slice(0,i+1) + 'x' + text.slice(i+1);
-      }
+  const DisplayKey = ({cyphertype}) =>{
+    
+    if (cyphertype ==="affine") {
+      return <div>
+              <label htmlFor="keyM">M</label>
+              <input type='number' onChange={(event)=>setAffineKey([affineKey[0],event.target.value])}/>
+              <label htmlFor="keyB">B</label>
+              <input type='number' onChange={(event)=>setAffineKey([event.target.value,affineKey[1]])}/>
+            </div>
     }
-    if(text.length%2===1){
-      text = text+'x;'
-    }
-    console.log(text);
-    console.log(key);
-    for (let i =0;i<text.length-2;i+=2){
-      //console.log(i);
-      let pos1= [0,0];
-      let pos2 = [0,0];
-      for (let y=0;y<5;y++){
-        for (let x=0;x<5;x++){
-          if(key[y][x] === text.charAt(i)){
-            pos1 = [y,x];
-          }
-          else if(key[y][x] === text.charAt(i+1)){
-            pos2=[y,x];
-          }
-        }
-      }
-      console.log(key[pos1[0]][pos1[1]])
-      console.log(key[pos2[0]][pos2[1]])
-      if (pos1[0] === pos2[0]){
-        pos1[1]++;
-        pos2[1]++;
-        if(pos1[1]===5){
-          pos1[1] = 0;
-        }
-        if(pos2[1] ===5){
-          pos2[1] = 0;
-        }
-        
-      }
-      else if (pos1[1] === pos2[1]){
-        pos1[0]++;
-        pos2[0]++;
-        if(pos1[0]===5){
-          pos1[0] = 0;
-        }
-        if(pos2[0] ===5){
-          pos2[0] = 0;
-        }
-      }
-      else {
-        let newPos1 =[pos1[0],pos2[1]];
-        let newPos2 = [pos2[0],pos1[1]];
-        pos1 = newPos1;
-        pos2 = newPos2;
-      }
-      encrypted = encrypted + key[pos1[0]][pos1[1]];
-      encrypted = encrypted + key[pos2[0]][pos2[1]];
-    }
-    console.log(encrypted);
-    console.log('selesai')
-    setResult(inputText);
-  }
-
-
-  const playfairKey = (cypherKey)=>{
-    let key =[
-                [0, 0,0,0,0],
-                [0, 0,0,0,0],
-                [0, 0,0,0,0],
-                [0, 0,0,0,0],
-                [0, 0,0,0,0]
-                          ];
-    let abjadCheck="abcdefghiklmnopqrstuvwxyz";
-    let keyText=""; 
-    for (let i =0;i<cypherKey.length;i++){
+    else if(cyphertype === "hill"){
+      return <div>
+              <input type='number' onChange={(event)=>setHillKey([[event.target.value,hillKey[0][1],hillKey[0][2]],
+                                                                  [hillKey[1][0],hillKey[1][1],hillKey[1][2]],
+                                                                  [hillKey[2][0],hillKey[2][1],hillKey[2][2]],])}/>
+              <input type='number' onChange={(event)=>setHillKey([...hillKey,event.target.value])}/>
+              <input type='number' onChange={(event)=>setHillKey([...hillKey,event.target.value])}/>
+              <input type='number' onChange={(event)=>setHillKey([...hillKey,event.target.value])}/>
+              <input type='number' onChange={(event)=>setHillKey([...hillKey,event.target.value])}/>
+              <input type='number' onChange={(event)=>setHillKey([...hillKey,event.target.value])}/>
+              <input type='number' onChange={(event)=>setHillKey([...hillKey,event.target.value])}/>
+              <input type='number' onChange={(event)=>setHillKey([...hillKey,event.target.value])}/>
+              <input type='number' onChange={(event)=>setHillKey([...hillKey,event.target.value])}/>
       
-      let char = cypherKey.charAt(i);
-      if(char.charCodeAt(0) >64  && char.charCodeAt(0) <123 && char.charCodeAt(0) !== 106 &&  char.charCodeAt(0) !==74 ){
-        if(char.charCodeAt(0)>64 && char.charCodeAt(0)<91){
-          char = String.fromCharCode(char.charCodeAt(0) +32);
-        }
-        if(!keyText.includes(char)){
-          keyText += char;
-          abjadCheck = abjadCheck.replace(char,'');  
-        }
-        
-      }
-
+      </div>
     }
-    let index = 0;
-    for (index=0 ;index<keyText.length;index++){
-      key[Math.floor(index/5)][index%5] = keyText.charAt(index);
+    else {
+      return <input type="text" onChange={(event)=>setKey(event.target.value)}/>
     }
-    for(index=keyText.length;index<25;index++){
-      key[Math.floor(index/5)][index%5] = abjadCheck.charAt(index-keyText.length);
-    }
-    return key;
-
   }
 
+  const getResult = async (event)=>{
+    event.preventDefault();
+    let result = '';
+    if (encryptTrue){
+      result = encrypt()
+      setResult(result);
+    }
+    else {
+      result = decrypt();
+      setResult(result);
+    }
+    
+  }
+  const encrypt = ()=>{
+    if(cypherType ==="playfair"){
+       return encryptPlayfair(inputText,cypherKey);
+    }
+    else {
+      return inputText;
+    }
+  }
+  const decrypt = ()=>{
+    if(cypherType ==="playfair"){
+      return decryptPlayfair(inputText,cypherKey);
+       
+    }
+    else {
+      return inputText;
+    }
+  }
+  
+
+
+  
 
 
   return (
     <div className="App">
-      <form onSubmit={encrypt}>
+      <form onSubmit={getResult}>
         <label>Input Type: </label>
         <select onChange={(event) =>setType(event.target.value)}>
           <option value="text">Text</option>
@@ -153,9 +110,9 @@ function App() {
           <option value="enigma">Enigma Cipher</option>
         </select>
         <label>Input Key: </label>
-        <input type="text" onChange={(event)=>setKey(event.target.value)}/>
-        <button type="submit">Encrypt</button>
-        <button type="submit">Decrypt</button>
+        <DisplayKey cyphertype = {cypherType}/>
+        <button type="submit"onClick={()=>setEncrypt(true)}>Encrypt</button>
+        <button type="submit" onClick={()=>setEncrypt(false)}>Decrypt</button>
       </form>
       <div class="result">
       <label>Result Text</label>
