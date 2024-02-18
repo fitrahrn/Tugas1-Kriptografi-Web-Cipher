@@ -5,21 +5,19 @@ const setUpPlayfairText = (inputText)=>{
     text = text.replace(/j/gi,'i');
     for (let i =0;i<text.length;i++){
       let char = text.charAt(i);
-      console.log(char.charCodeAt(0));
+
       
       if(char.charCodeAt(0)>64 && char.charCodeAt(0)<91){
         text = text.replace(char,String.fromCharCode(char.charCodeAt(0) +32));
       }
 
       if(i+1<text.length && text.charAt(i) === text.charAt(i+1) && i%2===0){
-        console.log("true");
         text = text.slice(0,i+1) + 'x' + text.slice(i+1);
       }
     }
     if(text.length%2===1){
       text = text+'x'
     }
-    console.log(text);
     return text;
   } 
 

@@ -1,10 +1,11 @@
-import React, {useState} from 'react';
+import React, {useState, Component} from 'react';
 import {encryptPlayfair,decryptPlayfair} from './cipher/playfairCipher';
+import { encryptAffine,decryptAffine } from './cipher/affineCipher';
 import './App.css';
 
 function App() {
   
-  const [textType,setType] = useState(""); //input type
+  const [textType,setType] = useState("text"); //input type
   const [inputText,setInput] = useState(""); //input text
   const [cypherType,setCypher] = useState(""); //set cypher type
   const [charType,setChar] = useState("")// plaintext or hex
@@ -14,36 +15,6 @@ function App() {
   const [resultText,setResult] = useState(""); //text after encrypted decrypt
   const [encryptTrue,setEncrypt] = useState(true);
 
-  const DisplayKey = ({cyphertype}) =>{
-    
-    if (cyphertype ==="affine") {
-      return <div>
-              <label htmlFor="keyM">M</label>
-              <input type='number' onChange={(event)=>setAffineKey([affineKey[0],event.target.value])}/>
-              <label htmlFor="keyB">B</label>
-              <input type='number' onChange={(event)=>setAffineKey([event.target.value,affineKey[1]])}/>
-            </div>
-    }
-    else if(cyphertype === "hill"){
-      return <div>
-              <input type='number' onChange={(event)=>setHillKey([[event.target.value,hillKey[0][1],hillKey[0][2]],
-                                                                  [hillKey[1][0],hillKey[1][1],hillKey[1][2]],
-                                                                  [hillKey[2][0],hillKey[2][1],hillKey[2][2]],])}/>
-              <input type='number' onChange={(event)=>setHillKey([...hillKey,event.target.value])}/>
-              <input type='number' onChange={(event)=>setHillKey([...hillKey,event.target.value])}/>
-              <input type='number' onChange={(event)=>setHillKey([...hillKey,event.target.value])}/>
-              <input type='number' onChange={(event)=>setHillKey([...hillKey,event.target.value])}/>
-              <input type='number' onChange={(event)=>setHillKey([...hillKey,event.target.value])}/>
-              <input type='number' onChange={(event)=>setHillKey([...hillKey,event.target.value])}/>
-              <input type='number' onChange={(event)=>setHillKey([...hillKey,event.target.value])}/>
-              <input type='number' onChange={(event)=>setHillKey([...hillKey,event.target.value])}/>
-      
-      </div>
-    }
-    else {
-      return <input type="text" onChange={(event)=>setKey(event.target.value)}/>
-    }
-  }
 
   const getResult = async (event)=>{
     event.preventDefault();
@@ -58,9 +29,23 @@ function App() {
     }
     
   }
+  const showFile = async (e) => {
+    e.preventDefault()
+    const reader = new FileReader()
+    reader.onload = async (e) => { 
+      setInput(e.target.result);
+      //console.log(text)
+      //alert(text)
+    };
+    reader.readAsText(e.target.files[0])
+  }
   const encrypt = ()=>{
+    //to do check if slope or m not an even number or can be divided by 13
     if(cypherType ==="playfair"){
        return encryptPlayfair(inputText,cypherKey);
+    }
+    else if (cypherType==="affine"){
+        return encryptAffine(inputText,affineKey);
     }
     else {
       return inputText;
@@ -70,6 +55,9 @@ function App() {
     if(cypherType ==="playfair"){
       return decryptPlayfair(inputText,cypherKey);
        
+    }
+    else if (cypherType==="affine"){
+      return decryptAffine(inputText,affineKey);
     }
     else {
       return inputText;
@@ -89,8 +77,17 @@ function App() {
           <option value="text">Text</option>
           <option value="file">File</option>
         </select>
+        {
+          textType ==="text" ? 
+        <div>
         <label>Input Text: </label>
         <input type="text" value={inputText} onInput={(event)=>setInput(event.target.value)}/>
+        </div> : 
+        <div>
+          <label>Input File: </label>
+          <input type="file" id="uploadFile" name="uploadFile"  onChange={(e) => showFile(e)}/>
+        </div>
+        }
         <div class="terms">
           <input type="radio" id="plaintext" name="input_type" value="plaintext" onChange={(event)=>setChar(event.target.value)}/>
           <label htmlFor="plaintext">Plaintext</label>
@@ -110,7 +107,27 @@ function App() {
           <option value="enigma">Enigma Cipher</option>
         </select>
         <label>Input Key: </label>
-        <DisplayKey cyphertype = {cypherType}/>
+        {
+          cypherType ==="affine" ? <div>
+          <label htmlFor="keyM">Slope / M</label>
+          <input type='number' onChange={(event)=>setAffineKey([Number(event.target.value),affineKey[1]])}/>
+          <label htmlFor="keyB">Intercept / B</label>
+          <input type='number' onChange={(event)=>setAffineKey([affineKey[0],Number(event.target.value)])}/>
+        </div>: cypherType ==="hill" ? 
+        <div>
+        <input type='number' onChange={(event)=>setHillKey([...hillKey,Number(event.target.value)])}/>
+        <input type='number' onChange={(event)=>setHillKey([...hillKey,Number(event.target.value)])}/>
+        <input type='number' onChange={(event)=>setHillKey([...hillKey,Number(event.target.value)])}/>
+        <input type='number' onChange={(event)=>setHillKey([...hillKey,Number(event.target.value)])}/>
+        <input type='number' onChange={(event)=>setHillKey([...hillKey,Number(event.target.value)])}/>
+        <input type='number' onChange={(event)=>setHillKey([...hillKey,Number(event.target.value)])}/>
+        <input type='number' onChange={(event)=>setHillKey([...hillKey,Number(event.target.value)])}/>
+        <input type='number' onChange={(event)=>setHillKey([...hillKey,Number(event.target.value)])}/>
+        <input type='number' onChange={(event)=>setHillKey([...hillKey,Number(event.target.value)])}/>
+
+        </div>:
+          <input type="text" name = 'cypherKey' value={cypherKey} onChange={(event)=>setKey(event.target.value)}/>
+        }
         <button type="submit"onClick={()=>setEncrypt(true)}>Encrypt</button>
         <button type="submit" onClick={()=>setEncrypt(false)}>Decrypt</button>
       </form>
