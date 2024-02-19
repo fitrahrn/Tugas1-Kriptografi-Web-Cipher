@@ -2,6 +2,7 @@ import React, {useState, Component} from 'react';
 import {encryptPlayfair,decryptPlayfair} from './cipher/playfairCipher';
 import { encryptAffine,decryptAffine } from './cipher/affineCipher';
 import './App.css';
+import {VigenereCipher, AutoKeyVigenereCipher, ExtendedVigenereCipher, SuperEnkripsi} from './cipher/cipher';
 
 function App() {
   
@@ -41,26 +42,39 @@ function App() {
   }
   const encrypt = ()=>{
     //to do check if slope or m not an even number or can be divided by 13
-    if(cypherType ==="playfair"){
-       return encryptPlayfair(inputText,cypherKey);
-    }
-    else if (cypherType==="affine"){
+    switch (cypherType) {
+      case "playfair":
+        return encryptPlayfair(inputText,cypherKey);
+      case "affine":
         return encryptAffine(inputText,affineKey);
-    }
-    else {
-      return inputText;
+      case "vigenereStandard":
+        return VigenereCipher.encrypt(cypherKey, inputText);
+      case "autoKeyVigenere":
+        return AutoKeyVigenereCipher.encrypt(cypherKey, inputText);
+      case "extendedVigenere":
+        return ExtendedVigenereCipher.encrypt(cypherKey, inputText);
+      case "superEnkripsi":
+        return SuperEnkripsi.encrypt(cypherKey, 2, inputText);
+      default:
+        return inputText;
     }
   }
   const decrypt = ()=>{
-    if(cypherType ==="playfair"){
-      return decryptPlayfair(inputText,cypherKey);
-       
-    }
-    else if (cypherType==="affine"){
-      return decryptAffine(inputText,affineKey);
-    }
-    else {
-      return inputText;
+    switch (cypherType) {
+      case "playfair":
+        return decryptPlayfair(inputText,cypherKey);
+      case "affine":
+        return decryptAffine(inputText,affineKey);
+      case "vigenereStandard":
+        return VigenereCipher.decrypt(cypherKey, inputText);
+      case "autoKeyVigenere":
+        return AutoKeyVigenereCipher.decrypt(cypherKey, inputText);
+      case "extendedVigenere":
+        return ExtendedVigenereCipher.decrypt(cypherKey, inputText);
+      case "superEnkripsi":
+        return SuperEnkripsi.decrypt(cypherKey, 2, inputText);
+      default:
+        return inputText
     }
   }
   
@@ -88,7 +102,7 @@ function App() {
           <input type="file" id="uploadFile" name="uploadFile"  onChange={(e) => showFile(e)}/>
         </div>
         }
-        <div class="terms">
+        <div className="terms">
           <input type="radio" id="plaintext" name="input_type" value="plaintext" onChange={(event)=>setChar(event.target.value)}/>
           <label htmlFor="plaintext">Plaintext</label>
           <input type="radio" id="hex" name="input_type" value="hex" onChange={(event)=>setChar(event.target.value)}/>
@@ -97,8 +111,8 @@ function App() {
         
         <label>Cipher Type: </label>
         <select onChange={(event)=>setCypher(event.target.value)}>
-          <option value="vignereStandard">Vignere Cipher Standard</option>
-          <option value="autoKeyVignere">Auto-Key Vigenere</option>
+          <option value="vigenereStandard">Vigenere Cipher Standard</option>
+          <option value="autoKeyVigenere">Auto-Key Vigenere</option>
           <option value="extendedVigenere">Extended Vigenere Cipher</option>
           <option value="playfair">Playfair Cipher</option>
           <option value="affine">Affine Cipher</option>
@@ -131,7 +145,7 @@ function App() {
         <button type="submit"onClick={()=>setEncrypt(true)}>Encrypt</button>
         <button type="submit" onClick={()=>setEncrypt(false)}>Decrypt</button>
       </form>
-      <div class="result">
+      <div className="result">
       <label>Result Text</label>
         <p value={resultText}>{resultText}</p>
       </div>
