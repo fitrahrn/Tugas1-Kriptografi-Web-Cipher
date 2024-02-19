@@ -59,7 +59,7 @@ function App() {
       case "extendedVigenere":
         return ExtendedVigenereCipher.encrypt(cypherKey, inputText);
       case "superEnkripsi":
-        return SuperEnkripsi.encrypt(cypherKey, 2, inputText);
+        return SuperEnkripsi.encrypt(cypherKey, 'bac', inputText);
       default:
         return inputText;
     }
@@ -79,7 +79,7 @@ function App() {
       case "extendedVigenere":
         return ExtendedVigenereCipher.decrypt(cypherKey, inputText);
       case "superEnkripsi":
-        return SuperEnkripsi.decrypt(cypherKey, 2, inputText);
+        return SuperEnkripsi.decrypt(cypherKey, 'bac', inputText);
       default:
         return inputText
     }

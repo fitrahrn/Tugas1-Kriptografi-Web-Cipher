@@ -1,8 +1,6 @@
 class VigenereCipher {
 
     static encrypt(key, plaintext) {
-        // var key = this.key.toLowerCase();
-        // var plaintext = this.plaintext.toLowerCase();
         key = key.toLowerCase();
         plaintext = plaintext.toLowerCase();
         plaintext = plaintext.replace(/\s+/g, '');
@@ -89,7 +87,7 @@ class ExtendedVigenereCipher {
         var result = '';
 
         for (let i = 0; i < ciphertext.length; i++) {
-            var charInAscii = this.plaintext.charCodeAt(i);
+            var charInAscii = ciphertext.charCodeAt(i);
             var keyInAscii = key.charCodeAt(i % key.length);
             var plaintextInAscii = ((charInAscii - keyInAscii) % 256 + 256) % 256;
             result += String.fromCharCode(plaintextInAscii);
@@ -99,30 +97,63 @@ class ExtendedVigenereCipher {
     }
 }
 
+class TranspositionCipher {
+
+    static splitText(text, length) {
+        var re = new RegExp(`(.|[\r\n]){1,${length}}`, 'g');
+        return text.match(re);
+    }
+
+    static encrypt(keyTransposisi, plaintext) {
+        var l = keyTransposisi.length;
+        var s = this.splitText(plaintext, l);
+
+        s[s.length - 1] += "x".repeat(l - s[s.length - 1].length);
+        var sortedKey = keyTransposisi.split('').sort();
+
+        var result = '';
+
+        for (let i = 0; i < l; i++) {
+            var idx = keyTransposisi.indexOf(sortedKey[i]);
+            for (let j = 0; j < s.length; j++) {
+                result += s[j][idx];
+            }
+        }
+
+        return result;
+    }
+
+    static decrypt(keyTransposisi, ciphertext) {
+        var l = keyTransposisi.length;
+        var s = this.splitText(ciphertext, ciphertext.length / l);
+
+        var sortedKey = keyTransposisi.split('').sort();
+        var result = [];
+
+        for (let i = 0; i < ciphertext.length / l; i++) {
+            result.push('');
+            for (let j = 0; j < l; j++) {
+                result[i] += s[keyTransposisi.indexOf(sortedKey[j])][i];
+            }
+        }
+
+        return result.join('');
+    }
+}
+
 class SuperEnkripsi {
 
-    static extendedVigenereCipher = new ExtendedVigenereCipher();
-
     static encrypt(keyVigenere, keyTransposisi, plaintext) {
-        var vigenereResult = this.extendedVigenereCipher.encrypt(keyVigenere, plaintext);
-        var transposisiResult = '';
-
-        for (let i = 0; i < vigenereResult.length; i++) {
-            transposisiResult += vigenereResult[i * keyTransposisi % (vigenereResult.length - 1)];
-        }
+        var vigenereResult = ExtendedVigenereCipher.encrypt(keyVigenere, plaintext);
+        var transposisiResult = TranspositionCipher.encrypt(keyTransposisi, vigenereResult);
 
         return transposisiResult;
     }
 
     static decrypt(keyVigenere, keyTransposisi, ciphertext) {
-        var transposisiResult = '';
-        keyTransposisi = ciphertext.length / keyTransposisi;
+        var transposisiResult = TranspositionCipher.decrypt(keyTransposisi, ciphertext);
+        var vigenereResult = ExtendedVigenereCipher.decrypt(keyVigenere, transposisiResult);
 
-        for (let i = 0; i < ciphertext.length; i++) {
-            transposisiResult += ciphertext[i * keyTransposisi % (ciphertext.length - 1)];
-        }
-
-        var vigenereResult = this.extendedVigenereCipher.decrypt(keyVigenere, transposisiResult);
         return vigenereResult;
     }
 
