@@ -1,6 +1,7 @@
 import React, {useState, Component} from 'react';
 import {encryptPlayfair,decryptPlayfair} from './cipher/playfairCipher';
 import { encryptAffine,decryptAffine } from './cipher/affineCipher';
+import { encryptHill,decryptHill } from './cipher/hillChiper';
 import './App.css';
 
 function App() {
@@ -11,13 +12,15 @@ function App() {
   const [charType,setChar] = useState("")// plaintext or hex
   const [cypherKey,setKey] = useState(""); // cipher key
   const [affineKey,setAffineKey] = useState([0,0]);
-  const [hillKey,setHillKey] = useState([])
+  const [hillKey,setHillKey] = useState(Array.from({length: 4}, (v, i) => i))
   const [resultText,setResult] = useState(""); //text after encrypted decrypt
   const [encryptTrue,setEncrypt] = useState(true);
+  const [hillSize,setSize] = useState(2);
 
 
   const getResult = async (event)=>{
     event.preventDefault();
+    console.log(hillKey);
     let result = '';
     if (encryptTrue){
       result = encrypt()
@@ -42,10 +45,13 @@ function App() {
   const encrypt = ()=>{
     //to do check if slope or m not an even number or can be divided by 13
     if(cypherType ==="playfair"){
-       return encryptPlayfair(inputText,cypherKey);
+      return encryptPlayfair(inputText,cypherKey);
     }
     else if (cypherType==="affine"){
-        return encryptAffine(inputText,affineKey);
+      return encryptAffine(inputText,affineKey);
+    }
+    else if (cypherType ==="hill"){
+      return encryptHill(inputText,hillKey);
     }
     else {
       return inputText;
@@ -58,6 +64,9 @@ function App() {
     }
     else if (cypherType==="affine"){
       return decryptAffine(inputText,affineKey);
+    }
+    else if (cypherType ==="hill"){
+      return decryptHill(inputText,hillKey);
     }
     else {
       return inputText;
@@ -115,16 +124,20 @@ function App() {
           <input type='number' onChange={(event)=>setAffineKey([affineKey[0],Number(event.target.value)])}/>
         </div>: cypherType ==="hill" ? 
         <div>
-        <input type='number' onChange={(event)=>setHillKey([...hillKey,Number(event.target.value)])}/>
-        <input type='number' onChange={(event)=>setHillKey([...hillKey,Number(event.target.value)])}/>
-        <input type='number' onChange={(event)=>setHillKey([...hillKey,Number(event.target.value)])}/>
-        <input type='number' onChange={(event)=>setHillKey([...hillKey,Number(event.target.value)])}/>
-        <input type='number' onChange={(event)=>setHillKey([...hillKey,Number(event.target.value)])}/>
-        <input type='number' onChange={(event)=>setHillKey([...hillKey,Number(event.target.value)])}/>
-        <input type='number' onChange={(event)=>setHillKey([...hillKey,Number(event.target.value)])}/>
-        <input type='number' onChange={(event)=>setHillKey([...hillKey,Number(event.target.value)])}/>
-        <input type='number' onChange={(event)=>setHillKey([...hillKey,Number(event.target.value)])}/>
-
+        <label htmlFor = 'sizeHill'>NxN matrix size</label>
+        <br/>
+        <input type ='number' onChange={(event)=>{setHillKey(Array.from({length: event.target.value*event.target.value}, (v, i) => i))}}/>        
+        <br/>
+        <label htmlFor = 'Matrix'>Matrix Values</label>
+        <br/>
+        {
+          hillKey.map((number,index)=>(
+            <input type='number' onChange={(event)=>{
+              let newArr = [...hillKey];
+              newArr[index] = event.target.value;
+              setHillKey(newArr)}}/>
+          ))
+        }
         </div>:
           <input type="text" name = 'cypherKey' value={cypherKey} onChange={(event)=>setKey(event.target.value)}/>
         }
