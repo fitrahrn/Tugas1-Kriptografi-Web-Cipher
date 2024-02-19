@@ -13,7 +13,7 @@ function App() {
   const [charType,setChar] = useState("")// plaintext or hex
   const [cypherKey,setKey] = useState(""); // cipher key
   const [affineKey,setAffineKey] = useState([0,0]);
-  const [hillKey,setHillKey] = useState(Array.from({length: 4}, (v, i) => i))
+  const [hillKey,setHillKey] = useState(Array.from({length: 4}, (v, i) => 0))
   const [resultText,setResult] = useState(""); //text after encrypted decrypt
   const [encryptTrue,setEncrypt] = useState(true);
   const [hillSize,setSize] = useState(2);
@@ -51,7 +51,7 @@ function App() {
       case "affine":
         return encryptAffine(inputText,affineKey);
       case 'hill':
-        return encryptHill(inputText,cypherKey);
+        return encryptHill(inputText,hillKey);
       case "vigenereStandard":
         return VigenereCipher.encrypt(cypherKey, inputText);
       case "autoKeyVigenere":
@@ -71,7 +71,7 @@ function App() {
       case "affine":
         return decryptAffine(inputText,affineKey);
       case 'hill':
-        return decryptHill(inputText,cypherKey);
+        return decryptHill(inputText,hillKey);
       case "vigenereStandard":
         return VigenereCipher.decrypt(cypherKey, inputText);
       case "autoKeyVigenere":
@@ -138,13 +138,13 @@ function App() {
         <div>
         <label htmlFor = 'sizeHill'>NxN matrix size</label>
         <br/>
-        <input type ='number' onChange={(event)=>{setHillKey(Array.from({length: event.target.value*event.target.value}, (v, i) => i))}}/>        
+        <input type ='number' onChange={(event)=>{setHillKey(Array.from({length: event.target.value*event.target.value}, (v, i) => 0))}}/>        
         <br/>
         <label htmlFor = 'Matrix'>Matrix Values</label>
         <br/>
         {
           hillKey.map((number,index)=>(
-            <input type='number' onChange={(event)=>{
+            <input type='number' defaultValue={0} value ={hillKey[index]}onChange={(event)=>{
               let newArr = [...hillKey];
               newArr[index] = event.target.value;
               setHillKey(newArr)}}/>
