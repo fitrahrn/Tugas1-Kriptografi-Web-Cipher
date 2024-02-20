@@ -18,6 +18,7 @@ function App() {
   const [encryptTrue,setEncrypt] = useState(true);
   const [hillSize,setSize] = useState(2);
   const [transpositionKey, setTransposition] = useState("");
+  const [encode64,setBase64] = useState("");
 
 
   const getResult = async (event)=>{
@@ -27,10 +28,12 @@ function App() {
     if (encryptTrue){
       result = encrypt()
       setResult(result);
+      setBase64(btoa(result));
     }
     else {
       result = decrypt();
       setResult(result);
+      setBase64(btoa(result));
     }
     
   }
@@ -166,6 +169,42 @@ function App() {
       <div className="result">
       <label>Result Text</label>
         <p value={resultText}>{resultText}</p>
+        <button onClick={() => {
+            const buffer = Uint8Array.from(resultText, c => c.charCodeAt(0));
+            const file = new Blob([buffer], { type:"text/plain"});
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(file);
+            link.download = "result.txt";
+            link.click();
+        }}>Download As Text File</button>
+        <button onClick={() => {
+            const buffer = Uint8Array.from(encode64, c => c.charCodeAt(0));
+            const file = new Blob([buffer], { type:"text/plain"});
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(file);
+            link.download = "result.dat";
+            link.click();
+        }}>Download As Binary File</button>
+      </div>
+      <div className="result">
+      <label>Base 64 Result</label>
+        <p value={encode64}>{encode64}</p>
+        <button onClick={() => {
+            const buffer = Uint8Array.from(encode64, c => c.charCodeAt(0));
+            const file = new Blob([buffer], { type:"text/plain"});
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(file);
+            link.download = "result.txt";
+            link.click();
+        }}>Download As Text File</button>
+        <button onClick={() => {
+            const buffer = Uint8Array.from(encode64, c => c.charCodeAt(0));
+            const file = new Blob([buffer], { type:"text/plain"});
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(file);
+            link.download = "result.dat";
+            link.click();
+        }}>Download As Binary File</button>
       </div>
         
 
