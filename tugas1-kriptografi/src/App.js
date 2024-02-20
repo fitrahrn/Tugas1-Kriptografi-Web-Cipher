@@ -17,6 +17,7 @@ function App() {
   const [resultText,setResult] = useState(""); //text after encrypted decrypt
   const [encryptTrue,setEncrypt] = useState(true);
   const [hillSize,setSize] = useState(2);
+  const [transpositionKey, setTransposition] = useState("");
 
 
   const getResult = async (event)=>{
@@ -59,7 +60,7 @@ function App() {
       case "extendedVigenere":
         return ExtendedVigenereCipher.encrypt(cypherKey, inputText);
       case "superEnkripsi":
-        return SuperEnkripsi.encrypt(cypherKey, 'bac', inputText);
+        return SuperEnkripsi.encrypt(cypherKey, transpositionKey, inputText);
       default:
         return inputText;
     }
@@ -79,7 +80,7 @@ function App() {
       case "extendedVigenere":
         return ExtendedVigenereCipher.decrypt(cypherKey, inputText);
       case "superEnkripsi":
-        return SuperEnkripsi.decrypt(cypherKey, 'bac', inputText);
+        return SuperEnkripsi.decrypt(cypherKey, transpositionKey, inputText);
       default:
         return inputText
     }
@@ -150,7 +151,13 @@ function App() {
               setHillKey(newArr)}}/>
           ))
         }
-        </div>:
+        </div>: cypherType === 'superEnkripsi' ?
+        <div>
+          <label htmlFor='vigenereKey'>Vigenere key</label><br/>
+          <input type='text' name='vigenereKey' value={cypherKey} onChange={(event)=>setKey(event.target.value)}/><br/>
+          <label htmlFor='transpositionKey'>Transposition key</label><br/>
+          <input type='text' name='transpositionKey' value={transpositionKey} onChange={(event)=>setTransposition(event.target.value)}/>
+        </div> :
           <input type="text" name = 'cypherKey' value={cypherKey} onChange={(event)=>setKey(event.target.value)}/>
         }
         <button type="submit"onClick={()=>setEncrypt(true)}>Encrypt</button>
