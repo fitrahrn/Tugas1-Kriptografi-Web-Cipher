@@ -86,3 +86,6 @@ button{
   font-size: 0.8em;
   font-weight: bold;
 }
+p{
+  word-wrap: break-word;
+}

@@ -3,15 +3,16 @@ class VigenereCipher {
     static encrypt(key, plaintext) {
         key = key.toLowerCase();
         plaintext = plaintext.toLowerCase();
-        plaintext = plaintext.replace(/\s+/g, '');
+        plaintext = plaintext.replace(/[^a-zA-Z]/gi,'');
         var result = '';
-        
+        console.log(plaintext);
         for (let i = 0; i < plaintext.length; i++) {
             var charInAscii = plaintext.charCodeAt(i);
             var keyInAscii = key.charCodeAt(i % key.length);
             var cipherInAscii = (((charInAscii - 97) + (keyInAscii - 97)) % 26) + 97;
             result += String.fromCharCode(cipherInAscii);
         }
+        //console.log(result);
 
         return result;
     }
@@ -19,7 +20,7 @@ class VigenereCipher {
     static decrypt(key, ciphertext) {
         key = key.toLowerCase();
         ciphertext = ciphertext.toLowerCase();
-        ciphertext = ciphertext.replace(/\s+/g, '');
+        ciphertext = ciphertext.replace(/[^a-zA-Z]/gi,'');
         var result = '';
         
         for (let i = 0; i < ciphertext.length; i++) {
@@ -38,7 +39,7 @@ class AutoKeyVigenereCipher {
     static encrypt(key, plaintext) {
         key = key.toLowerCase();
         plaintext = plaintext.toLowerCase();
-        plaintext = plaintext.replace(/\s+/g, '');
+        plaintext = plaintext.replace(/[^a-zA-Z]/gi,'');
         var result = '';
 
         for (let i = 0; i < plaintext.length; i++) {
@@ -54,7 +55,7 @@ class AutoKeyVigenereCipher {
     static decrypt(key, ciphertext) {
         key = key.toLowerCase();
         ciphertext = ciphertext.toLowerCase();
-        ciphertext = ciphertext.replace(/\s+/g, '');
+        ciphertext = ciphertext.replace(/[^a-zA-Z]/gi,'');
         var result = '';
         
         for (let i = 0; i < ciphertext.length; i++) {

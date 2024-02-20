@@ -2,13 +2,11 @@
 const changeAlphabettoNumeric = (inputText) =>{
     let numArray = [];
     inputText = inputText.replace(/[^a-zA-Z]/gi,'');
+    inputText = inputText.toLowerCase();
     for (let i = 0;i<inputText.length;i++){
         let char = inputText.charAt(i);
         if(char.charCodeAt(0) >96  && char.charCodeAt(0) <123){
             numArray.push(char.charCodeAt(0)-97); 
-        }
-        if(char.charCodeAt(0)>64 && char.charCodeAt(0)<91){
-            numArray.push(char.charCodeAt(0)-65);
         }
     }
     return numArray;

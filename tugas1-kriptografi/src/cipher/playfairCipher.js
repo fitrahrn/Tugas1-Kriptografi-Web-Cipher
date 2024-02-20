@@ -1,15 +1,11 @@
 
 const setUpPlayfairText = (inputText)=>{
     let text=inputText;
+    text = text.toLowerCase();
     text = text.replace(/[^a-zA-Z]/gi,'');
     text = text.replace(/j/gi,'i');
     for (let i =0;i<text.length;i++){
-      let char = text.charAt(i);
 
-      
-      if(char.charCodeAt(0)>64 && char.charCodeAt(0)<91){
-        text = text.replace(char,String.fromCharCode(char.charCodeAt(0) +32));
-      }
 
       if(i+1<text.length && text.charAt(i) === text.charAt(i+1) && i%2===0){
         text = text.slice(0,i+1) + 'x' + text.slice(i+1);

@@ -9,22 +9,24 @@ function App() {
   
   const [textType,setType] = useState("text"); //input type
   const [inputText,setInput] = useState(""); //input text
-  const [cypherType,setCypher] = useState(""); //set cypher type
+  const [cypherType,setCypher] = useState("vigenereStandard"); //set cypher type
   const [charType,setChar] = useState("")// plaintext or hex
   const [cypherKey,setKey] = useState(""); // cipher key
-  const [affineKey,setAffineKey] = useState([0,0]);
+  const [affineKey,setAffineKey] = useState([1,0]);
   const [hillKey,setHillKey] = useState(Array.from({length: 4}, (v, i) => 0))
   const [resultText,setResult] = useState(""); //text after encrypted decrypt
   const [encryptTrue,setEncrypt] = useState(true);
-  const [hillSize,setSize] = useState(2);
   const [transpositionKey, setTransposition] = useState("");
   const [encode64,setBase64] = useState("");
 
 
   const getResult = async (event)=>{
     event.preventDefault();
-    console.log(hillKey);
     let result = '';
+    if(affineKey[0] === 0 || affineKey[0] % 2 === 0 || affineKey[0] % 13 === 0){
+      alert("Slope must be Coprime with 26");
+      return result;
+  }
     if (encryptTrue){
       result = encrypt()
       setResult(result);
@@ -48,6 +50,7 @@ function App() {
     reader.readAsText(e.target.files[0])
   }
   const encrypt = ()=>{
+    console.log(cypherType);
     //to do check if slope or m not an even number or can be divided by 13
     switch (cypherType) {
       case "playfair":
@@ -113,12 +116,12 @@ function App() {
           <input type="file" id="uploadFile" name="uploadFile"  onChange={(e) => showFile(e)}/>
         </div>
         }
-        <div className="terms">
+        {/* <div className="terms">
           <input type="radio" id="plaintext" name="input_type" value="plaintext" onChange={(event)=>setChar(event.target.value)}/>
           <label htmlFor="plaintext">Plaintext</label>
           <input type="radio" id="hex" name="input_type" value="hex" onChange={(event)=>setChar(event.target.value)}/>
           <label htmlFor="hex">Hex</label>
-        </div>
+        </div> */}
         
         <label>Cipher Type: </label>
         <select onChange={(event)=>setCypher(event.target.value)}>
@@ -135,9 +138,9 @@ function App() {
         {
           cypherType ==="affine" ? <div>
           <label htmlFor="keyM">Slope / M</label>
-          <input type='number' onChange={(event)=>setAffineKey([Number(event.target.value),affineKey[1]])}/>
+          <input type='number' value = {affineKey[0]} onChange={(event)=>setAffineKey([Number(event.target.value),affineKey[1]])}/>
           <label htmlFor="keyB">Intercept / B</label>
-          <input type='number' onChange={(event)=>setAffineKey([affineKey[0],Number(event.target.value)])}/>
+          <input type='number' value = {affineKey[1]} onChange={(event)=>setAffineKey([affineKey[0],Number(event.target.value)])}/>
         </div>: cypherType ==="hill" ? 
         <div>
         <label htmlFor = 'sizeHill'>NxN matrix size</label>
