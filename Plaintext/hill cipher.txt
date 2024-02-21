@@ -1,0 +1,1 @@
+Kurang berhasil artinya program tidak selesai, atau program masih ada kesalahan, atau program hanya bisa melakukan enkripsi tetapi dekripsi salah, atau hanya bisa enkripsi file text tidak bisa file sembarang, atau hanya bisa enkripsi pesan diketik langsung tidak bisa untuk file, dll. Tuliskan pada bagian keterangan aspek apa yang kurang berhasil.

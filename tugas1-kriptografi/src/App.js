@@ -170,6 +170,7 @@ function App() {
           <input type='text' name='transpositionKey' value={transpositionKey} onChange={(event)=>setTransposition(event.target.value)}/>
         </div> : cypherType ==='enigma' ?
         <div>
+          <label htmlFor="Rotor1">Rotor Starting Position</label><br/>
           <label htmlFor="Rotor1">Rotor 1</label>
           <input type='text' value = {enigmaStartingPos[0]} pattern="[A-Za-z]{1}" onChange={(event)=>setPosition([event.target.value,enigmaStartingPos[1],enigmaStartingPos[2]])}/>
           <label htmlFor="Rotor2">Rotor 2</label>

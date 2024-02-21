@@ -1,0 +1,1 @@
+Empat baris selanjutnya diisi dengan informasi hidden layer. Baris kedua adalah menyatakan bahwa pada hidden layer ini terdapat node sebanyak dua. Karena ada dua node, 2 baris selanjutnya akan diisi dengan informasi bias dan bobot pada masing-masing node.
