@@ -11,12 +11,20 @@ const changeAlphabettoNumeric = (inputText) =>{
     }
     return numArray;
 }
+
 const changeNumerictoAlphabetic = (inputArray) => {
    let encryptedText = '';
    for (let i=0;i<inputArray.length;i++){
         encryptedText += (String.fromCharCode(inputArray[i]+97));
    } 
    return encryptedText;
+}
+const changeNumerictoAlphabeticUpperCase = (inputArray) => {
+  let encryptedText = '';
+  for (let i=0;i<inputArray.length;i++){
+       encryptedText += (String.fromCharCode(inputArray[i]+65));
+  } 
+  return encryptedText;
 }
 
 function modInverse(a, m) {
@@ -80,4 +88,4 @@ function convertToMatrix(m1){
 }
 
 export {modInverse,modulo,changeAlphabettoNumeric,changeNumerictoAlphabetic,
-multiplyMatrices,convertToMatrix};
+multiplyMatrices,convertToMatrix,changeNumerictoAlphabeticUpperCase};

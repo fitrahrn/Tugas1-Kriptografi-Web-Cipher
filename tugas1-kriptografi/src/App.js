@@ -4,7 +4,7 @@ import { encryptAffine,decryptAffine } from './cipher/affineCipher';
 import { encryptHill,decryptHill } from './cipher/hillChiper';
 import './App.css';
 import {VigenereCipher, AutoKeyVigenereCipher, ExtendedVigenereCipher, SuperEnkripsi} from './cipher/cipher';
-
+import { encryptEnigma } from './cipher/enigmaChiper';
 function App() {
   
   const [textType,setType] = useState("text"); //input type
@@ -13,6 +13,7 @@ function App() {
   const [charType,setChar] = useState("")// plaintext or hex
   const [cypherKey,setKey] = useState(""); // cipher key
   const [affineKey,setAffineKey] = useState([1,0]);
+  const [enigmaStartingPos,setPosition] = useState(['A','A','A'])
   const [hillKey,setHillKey] = useState(Array.from({length: 4}, (v, i) => 0))
   const [resultText,setResult] = useState(""); //text after encrypted decrypt
   const [encryptTrue,setEncrypt] = useState(true);
@@ -67,6 +68,8 @@ function App() {
         return ExtendedVigenereCipher.encrypt(cypherKey, inputText);
       case "superEnkripsi":
         return SuperEnkripsi.encrypt(cypherKey, transpositionKey, inputText);
+      case "enigma":
+        return encryptEnigma(inputText,enigmaStartingPos);
       default:
         return inputText;
     }
@@ -87,6 +90,8 @@ function App() {
         return ExtendedVigenereCipher.decrypt(cypherKey, inputText);
       case "superEnkripsi":
         return SuperEnkripsi.decrypt(cypherKey, transpositionKey, inputText);
+      case "enigma":
+        return encryptEnigma(inputText,enigmaStartingPos);
       default:
         return inputText
     }
@@ -163,7 +168,18 @@ function App() {
           <input type='text' name='vigenereKey' value={cypherKey} onChange={(event)=>setKey(event.target.value)}/><br/>
           <label htmlFor='transpositionKey'>Transposition key</label><br/>
           <input type='text' name='transpositionKey' value={transpositionKey} onChange={(event)=>setTransposition(event.target.value)}/>
-        </div> :
+        </div> : cypherType ==='enigma' ?
+        <div>
+          <label htmlFor="Rotor1">Rotor 1</label>
+          <input type='text' value = {enigmaStartingPos[0]} pattern="[A-Za-z]{1}" onChange={(event)=>setPosition([event.target.value,enigmaStartingPos[1],enigmaStartingPos[2]])}/>
+          <label htmlFor="Rotor2">Rotor 2</label>
+          <input type='text' value = {enigmaStartingPos[1]} pattern="[A-Za-z]{1}" onChange={(event)=>setPosition([enigmaStartingPos[0],event.target.value,enigmaStartingPos[2]])}/>
+          <label htmlFor="Rotor3">Rotor 3</label>
+          <input type='text' value = {enigmaStartingPos[2]} pattern="[A-Za-z]{1}" onChange={(event)=>setPosition([enigmaStartingPos[0],enigmaStartingPos[1],event.target.value])}/>
+          
+          
+        </div>
+        :
           <input type="text" name = 'cypherKey' value={cypherKey} onChange={(event)=>setKey(event.target.value)}/>
         }
         <button type="submit"onClick={()=>setEncrypt(true)}>Encrypt</button>
