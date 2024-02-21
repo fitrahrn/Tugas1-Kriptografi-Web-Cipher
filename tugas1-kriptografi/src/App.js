@@ -19,7 +19,8 @@ function App() {
   const [encryptTrue,setEncrypt] = useState(true);
   const [transpositionKey, setTransposition] = useState("");
   const [encode64,setBase64] = useState("");
-
+  const [fileName, setFileName] = useState("");
+  const [isBinaryFile, setIsBinaryFile] = useState(false);
 
   const getResult = async (event)=>{
     event.preventDefault();
@@ -44,11 +45,21 @@ function App() {
     e.preventDefault()
     const reader = new FileReader()
     reader.onload = async (e) => { 
-      setInput(e.target.result);
+      if (cypherType === 'extendedVigenere' || cypherType === 'superEnkripsi') {
+        setInput(new Uint8Array(e.target.result));
+      } else {
+        setInput(e.target.result)
+      }
       //console.log(text)
       //alert(text)
     };
-    reader.readAsText(e.target.files[0])
+    if (cypherType === 'extendedVigenere' || cypherType === 'superEnkripsi') {
+      reader.readAsArrayBuffer(e.target.files[0]);
+      setFileName(e.target.files[0].name);
+      setIsBinaryFile(true);
+    } else {
+      reader.readAsText(e.target.files[0])
+    }
   }
   const encrypt = ()=>{
     console.log(cypherType);
@@ -65,9 +76,11 @@ function App() {
       case "autoKeyVigenere":
         return AutoKeyVigenereCipher.encrypt(cypherKey, inputText);
       case "extendedVigenere":
-        return ExtendedVigenereCipher.encrypt(cypherKey, inputText);
+        return isBinaryFile ? ExtendedVigenereCipher.encryptFile(cypherKey, inputText, fileName) :
+         ExtendedVigenereCipher.encrypt(cypherKey, inputText);
       case "superEnkripsi":
-        return SuperEnkripsi.encrypt(cypherKey, transpositionKey, inputText);
+        return isBinaryFile ? SuperEnkripsi.encryptFile(cypherKey, transpositionKey, inputText, fileName) :
+         SuperEnkripsi.encrypt(cypherKey, transpositionKey, inputText);
       case "enigma":
         return encryptEnigma(inputText,enigmaStartingPos);
       default:
@@ -87,20 +100,25 @@ function App() {
       case "autoKeyVigenere":
         return AutoKeyVigenereCipher.decrypt(cypherKey, inputText);
       case "extendedVigenere":
-        return ExtendedVigenereCipher.decrypt(cypherKey, inputText);
+        if (!isBinaryFile) {
+          return ExtendedVigenereCipher.decrypt(cypherKey, inputText);
+        }
+        const [vigResult, vigFilename] = ExtendedVigenereCipher.decryptFile(cypherKey, inputText);
+        setFileName(vigFilename);
+        return vigResult;
       case "superEnkripsi":
-        return SuperEnkripsi.decrypt(cypherKey, transpositionKey, inputText);
+        if (!isBinaryFile) {
+          return SuperEnkripsi.decrypt(cypherKey, transpositionKey, inputText);
+        }
+        const [supResult, supFilename] = SuperEnkripsi.decryptFile(cypherKey, transpositionKey, inputText);
+        setFileName(supFilename);
+        return supResult;
       case "enigma":
         return encryptEnigma(inputText,enigmaStartingPos);
       default:
         return inputText
     }
   }
-  
-
-
-  
-
 
   return (
     <div className="App">
@@ -198,11 +216,11 @@ function App() {
             link.click();
         }}>Download As Text File</button>
         <button onClick={() => {
-            const buffer = Uint8Array.from(encode64, c => c.charCodeAt(0));
+            const buffer = Uint8Array.from(resultText, c => c.charCodeAt(0));
             const file = new Blob([buffer], { type:"text/plain"});
             const link = document.createElement("a");
             link.href = URL.createObjectURL(file);
-            link.download = "result.dat";
+            link.download = (isBinaryFile && !encryptTrue) ? fileName : "result.dat";
             link.click();
         }}>Download As Binary File</button>
       </div>
@@ -226,9 +244,6 @@ function App() {
             link.click();
         }}>Download As Binary File</button>
       </div>
-        
-
-
     </div>
   );
 }

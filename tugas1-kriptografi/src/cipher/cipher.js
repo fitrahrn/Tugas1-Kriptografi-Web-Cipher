@@ -75,12 +75,19 @@ class ExtendedVigenereCipher {
         var result = '';
 
         for (let i = 0; i < plaintext.length; i++) {
-            var charInAscii = plaintext.charCodeAt(i);
+            var charInAscii = typeof plaintext === 'string' ? plaintext.charCodeAt(i) : plaintext[i];
             var keyInAscii = key.charCodeAt(i % key.length);
             var cipherInAscii = (charInAscii + keyInAscii) % 256;
             result += String.fromCharCode(cipherInAscii);
         }
 
+        return result;
+    }
+
+    static encryptFile(key, plaintext, fileName) {
+        var result = this.encrypt(key, plaintext);
+        result += fileName;
+        result += fileName.length.toString();
         return result;
     }
 
@@ -96,6 +103,22 @@ class ExtendedVigenereCipher {
 
         return result;
     }
+
+    static decryptFile(key, ciphertext) {
+        if (typeof ciphertext !== 'string') {
+            var text = '';
+            for (var i = 0; i < ciphertext.length; i++) {
+                text += String.fromCharCode(ciphertext[i]);
+            }
+            ciphertext = text;
+        }
+        var lengthInStr = ciphertext.match(/\d+$/)[0];
+        var length = parseInt(lengthInStr, 10);
+        var fileName = ciphertext.slice(-lengthInStr.length - length, -lengthInStr.length);
+        ciphertext = ciphertext.slice(0, -lengthInStr.length - length);
+        var result = this.decrypt(key, ciphertext);
+        return [result, fileName];
+    }
 }
 
 class TranspositionCipher {
@@ -106,18 +129,13 @@ class TranspositionCipher {
     }
 
     static encrypt(keyTransposisi, plaintext) {
-        var l = keyTransposisi.length;
-        var s = this.splitText(plaintext, l);
-
-        s[s.length - 1] += "x".repeat(l - s[s.length - 1].length);
-        var sortedKey = keyTransposisi.split('').sort();
-
+        var s = this.splitText(plaintext, keyTransposisi);
+        s[s.length - 1] += "x".repeat(keyTransposisi - s[s.length - 1].length);
         var result = '';
 
-        for (let i = 0; i < l; i++) {
-            var idx = keyTransposisi.indexOf(sortedKey[i]);
+        for (let i = 0; i < keyTransposisi; i++) {
             for (let j = 0; j < s.length; j++) {
-                result += s[j][idx];
+                result += s[j][i];
             }
         }
 
@@ -125,20 +143,24 @@ class TranspositionCipher {
     }
 
     static decrypt(keyTransposisi, ciphertext) {
-        var l = keyTransposisi.length;
-        var s = this.splitText(ciphertext, ciphertext.length / l);
+        if (typeof ciphertext !== 'string') {
+            var text = '';
+            for (var i = 0; i < ciphertext.length; i++) {
+                text += String.fromCharCode(ciphertext[i]);
+            }
+            ciphertext = text;
+        }
+        var s = this.splitText(ciphertext, ciphertext.length / keyTransposisi);
+        var result = '';
 
-        var sortedKey = keyTransposisi.split('').sort();
-        var result = [];
-
-        for (let i = 0; i < ciphertext.length / l; i++) {
-            result.push('');
-            for (let j = 0; j < l; j++) {
-                result[i] += s[keyTransposisi.indexOf(sortedKey[j])][i];
+        for (let i = 0; i < ciphertext.length / keyTransposisi; i++) {
+            for (let j = 0; j < keyTransposisi; j++) {
+                result += s[j][i];
             }
         }
+        result = result.replace(/(x*)$/g,'');
 
-        return result.join('');
+        return result;
     }
 }
 
@@ -151,11 +173,25 @@ class SuperEnkripsi {
         return transposisiResult;
     }
 
+    static encryptFile(keyVigenere, keyTransposisi, plaintext, fileName) {
+        var vigenereResult = ExtendedVigenereCipher.encryptFile(keyVigenere, plaintext, fileName);
+        var transposisiResult = TranspositionCipher.encrypt(keyTransposisi, vigenereResult);
+
+        return transposisiResult;
+    }
+
     static decrypt(keyVigenere, keyTransposisi, ciphertext) {
         var transposisiResult = TranspositionCipher.decrypt(keyTransposisi, ciphertext);
         var vigenereResult = ExtendedVigenereCipher.decrypt(keyVigenere, transposisiResult);
 
         return vigenereResult;
+    }
+
+    static decryptFile(keyVigenere, keyTransposisi, ciphertext) {
+        var transposisiResult = TranspositionCipher.decrypt(keyTransposisi, ciphertext);
+        var [vigenereResult, fileName] = ExtendedVigenereCipher.decryptFile(keyVigenere, transposisiResult);
+
+        return [vigenereResult, fileName];
     }
 
 }
