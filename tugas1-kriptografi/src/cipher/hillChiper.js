@@ -96,7 +96,7 @@ const decryptHill =  (inputText,cypherKey) =>{
         }
         determinant  = Math.round(determinant);
         if(determinant === 0 || determinant % 2 === 0 || determinant % 13 === 0){
-            return "Matriks tidak invertible dengan mod 26";
+            return "Matriks is not invertible with mod 26";
         }
         let equivalenDeterminan = modInverse(determinant,26);
         console.log(equivalenDeterminan);
@@ -118,7 +118,7 @@ const decryptHill =  (inputText,cypherKey) =>{
         return changeNumerictoAlphabetic(encryptedArray);
     }   
     else {
-        return "Matriks tidak invertible dengan mod 26";
+        return "Matriks is not invertible with mod 26";
     }
 }
     
